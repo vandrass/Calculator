@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="StyleCop.Analyzers rules with default action" Description="StyleCop.Analyzers with default action. Rules with IsEnabledByDefault = false are disabled." ToolsVersion="16.0">
+<RuleSet Name="StyleCop.Analyzers rules with default action" Description="StyleCop.Analyzers with default action. Rules with IsEnabledByDefault = false are disabled." ToolsVersion="17.0">
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.DocumentationRules">
     <Rule Id="SA1600" Action="Warning" />
     <Rule Id="SA1601" Action="Warning" />
@@ -35,7 +35,7 @@
     <Rule Id="SA1631" Action="None" />
     <Rule Id="SA1632" Action="None" />
     <Rule Id="SA1633" Action="None" />
-    <Rule Id="SA1634" Action="Warning" />
+    <Rule Id="SA1634" Action="None" />
     <Rule Id="SA1635" Action="Warning" />
     <Rule Id="SA1636" Action="Warning" />
     <Rule Id="SA1637" Action="Warning" />
@@ -174,8 +174,10 @@
     <Rule Id="SX1101" Action="None" />
   </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <Rule Id="SA0001" Action="None" />
     <Rule Id="SA1200" Action="None" />
     <Rule Id="SA1633" Action="None" />
+    <Rule Id="SA1634" Action="None" />
   </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.SpacingRules">
     <Rule Id="SA1000" Action="Warning" />

@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace Calculator.UI
+﻿namespace Calculator.UI
 {
     public class Program
     {
-        static void Main()
+        public static void Main()
         {
         }
     }
