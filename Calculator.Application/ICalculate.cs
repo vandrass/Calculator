@@ -2,8 +2,8 @@
 {
     public interface ICalculate
     {
-        public void CalculateManualExpression();
+        public EnumErrors CalculateManualExpression();
 
-        public void CalculateFileExpressions();
+        public EnumErrors CalculateFileExpressions();
     }
 }
