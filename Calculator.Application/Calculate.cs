@@ -20,10 +20,12 @@ namespace Calculator.Application
 
             if (operators.Count == 0)
             {
-                enumErrors = EnumErrors.NoOperators;
+                return EnumErrors.NoOperators;
             }
 
             Calculating();
+
+            return enumErrors;
         }
 
         public EnumErrors CalculateFileExpressions(string path)
@@ -33,6 +35,7 @@ namespace Calculator.Application
 
         private void Calculating()
         {
+            double result = 0;
 
         }
 
@@ -40,7 +43,6 @@ namespace Calculator.Application
         {
             var stringLenth = expression.Length;
             var strBuilder = new StringBuilder();
-            double parseNumber;
 
             for (int i = 0; i < stringLenth; i++)
             {
@@ -50,23 +52,48 @@ namespace Calculator.Application
                 }
                 else
                 {
-                    if (strBuilder.Length > 0)
+                    if (!ParseNumber(strBuilder))
                     {
-                        if (double.TryParse(strBuilder.ToString().Trim(), out parseNumber))
+                        if (enumErrors == EnumErrors.NotCorrectExpression)
                         {
-                            numbers.Add(parseNumber);
-                            strBuilder.Clear();
-                        }
-                        else
-                        {
-                            enumErrors = EnumErrors.NotCorrectExpression;
                             return;
                         }
                     }
 
-                    operators.Add(expression[i]);
+                    if (i != stringLenth - 1)
+                    {
+                        operators.Add(expression[i]);
+                    }
+                }
+
+                if (i == stringLenth - 1)
+                {
+                    ParseNumber(strBuilder);
                 }
             }
+        }
+
+        private bool ParseNumber(StringBuilder strBuilder)
+        {
+            double parseNumber;
+
+            if (strBuilder.Length > 0)
+            {
+                if (double.TryParse(strBuilder.ToString().Trim(), out parseNumber))
+                {
+                    numbers.Add(parseNumber);
+
+                    strBuilder.Clear();
+
+                    return true;
+                }
+
+                enumErrors = EnumErrors.NotCorrectExpression;
+
+                return false;
+            }
+
+            return false;
         }
 
         private bool IsDigit(char ch)
