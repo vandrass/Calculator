@@ -1,7 +1,16 @@
 ﻿namespace Calculator.Application
 {
-    public class Calculate
+    public class Calculate : ICalculate
     {
+        public EnumErrors CalculateManualExpression(string expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public EnumErrors CalculateFileExpressions(string path)
+        {
+            throw new System.NotImplementedException();
+        }
 
         private void Sum()
         {
@@ -22,6 +31,5 @@
         {
 
         }
-
     }
 }
