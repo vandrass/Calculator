@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Text.RegularExpressions;
+using Calculator.Application;
 
 namespace Calculator.UI
 {
@@ -11,10 +11,12 @@ namespace Calculator.UI
             char mode = ChooseCalcMode();
             string expression;
             string path;
+            var calculator = new Calculate();
 
             if (mode == 'm')
             {
                 expression = EnterExpression();
+                calculator.CalculateManualExpression(expression);
             }
             else
             {
@@ -24,19 +26,8 @@ namespace Calculator.UI
 
         private static string EnterExpression()
         {
-            string expression;
-            string pattern = @"^\s * ([-+] ?)(\d +)(?:\s * ([-+*\/])\s * ((?:\s[-+]) ?\d +)\s *)+$";
-
-            while (true)
-            {
-                Console.Write("Enter the expression without brackets: ");
-                expression = Console.ReadLine();
-
-                if (Regex.IsMatch(expression, pattern, RegexOptions.IgnoreCase))
-                {
-                    return expression;
-                }
-            }
+            Console.Write("Enter the expression without brackets: ");
+            return Console.ReadLine();
         }
 
         private static string EnterPathToFile()

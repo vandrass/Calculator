@@ -6,6 +6,11 @@
     public enum EnumErrors
     {
         /// <summary>
+        /// Empty Input.
+        /// </summary>
+        None,
+
+        /// <summary>
         /// If is division by zero.
         /// </summary>
         DivisionByZero,
