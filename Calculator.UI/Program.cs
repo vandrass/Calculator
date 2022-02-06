@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Calculator.UI
 {
@@ -24,10 +25,18 @@ namespace Calculator.UI
         private static string EnterExpression()
         {
             string expression;
-            Console.Write("Enter the expression without brackets: ");
-            expression = Console.ReadLine();
+            string pattern = @"^\s * ([-+] ?)(\d +)(?:\s * ([-+*\/])\s * ((?:\s[-+]) ?\d +)\s *)+$";
 
-            return expression;
+            while (true)
+            {
+                Console.Write("Enter the expression without brackets: ");
+                expression = Console.ReadLine();
+
+                if (Regex.IsMatch(expression, pattern, RegexOptions.IgnoreCase))
+                {
+                    return expression;
+                }
+            }
         }
 
         private static string EnterPathToFile()
