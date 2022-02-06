@@ -2,7 +2,7 @@
 {
     public interface ICalculate
     {
-        public EnumErrors CalculateManualExpression(string expression);
+        public EnumErrors CalculateManualExpression(string expression, ref double result);
 
         public EnumErrors CalculateFileExpressions(string path);
     }

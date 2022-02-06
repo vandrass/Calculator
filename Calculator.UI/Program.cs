@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Calculator.Application;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Calculator.UI
 {
@@ -11,12 +12,25 @@ namespace Calculator.UI
             char mode = ChooseCalcMode();
             string expression;
             string path;
-            var calculator = new Calculate();
+            double result = 0;
+            EnumErrors errors = EnumErrors.None;
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddScoped<ICalculate, Calculate>();
+            var provider = serviceCollection.BuildServiceProvider();
+            var service = provider.GetRequiredService<ICalculate>();
 
             if (mode == 'm')
             {
                 expression = EnterExpression();
-                calculator.CalculateManualExpression(expression);
+                errors = service.CalculateManualExpression(expression, ref result);
+                if (errors == EnumErrors.Success)
+                {
+                    Console.WriteLine(result);
+                }
+                else
+                {
+                    Console.WriteLine(errors);
+                }
             }
             else
             {

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Calculator.Application
@@ -6,10 +7,10 @@ namespace Calculator.Application
     public class Calculate : ICalculate
     {
         private EnumErrors enumErrors = EnumErrors.None;
-        private ArrayList numbers = new ArrayList();
+        private List<double> numbers = new List<double>();
         private ArrayList operators = new ArrayList();
 
-        public EnumErrors CalculateManualExpression(string expression)
+        public EnumErrors CalculateManualExpression(string expression, ref double result)
         {
             ParseString(expression);
 
@@ -25,6 +26,8 @@ namespace Calculator.Application
 
             Calculating();
 
+            result = numbers[0];
+
             return enumErrors;
         }
 
@@ -37,6 +40,63 @@ namespace Calculator.Application
         {
             double result = 0;
 
+            while (operators.Count > 0)
+            {
+                for (int i = 0; i < operators.Count; i++)
+                {
+                    if ((char)operators[i] == '/')
+                    {
+                        if (numbers[i + 1] == 0)
+                        {
+                            enumErrors = EnumErrors.DivisionByZero;
+                            return;
+                        }
+
+                        result = Division(numbers[i], numbers[i + 1]);
+                        InsertAndRemove(result, i);
+                        i--;
+                    }
+                }
+
+                for (int i = 0; i < operators.Count; i++)
+                {
+                    if ((char)operators[i] == '*')
+                    {
+                        result = Multiplication(numbers[i], numbers[i + 1]);
+                        InsertAndRemove(result, i);
+                        i--;
+                    }
+                }
+
+                for (int i = 0; i < operators.Count; i++)
+                {
+                    if ((char)operators[i] == '+')
+                    {
+                        result = Sum(numbers[i], numbers[i + 1]);
+                        InsertAndRemove(result, i);
+                        i--;
+                    }
+                }
+
+                for (int i = 0; i < operators.Count; i++)
+                {
+                    if ((char)operators[i] == '-')
+                    {
+                        result = Sub(numbers[i], numbers[i + 1]);
+                        InsertAndRemove(result, i);
+                        i--;
+                    }
+                }
+            }
+
+            enumErrors = EnumErrors.Success;
+        }
+
+        private void InsertAndRemove(double result, int i)
+        {
+            numbers.Insert(i, result);
+            numbers.RemoveRange(i + 1, 2);
+            operators.RemoveAt(i);
         }
 
         private void ParseString(string expression)
@@ -106,24 +166,24 @@ namespace Calculator.Application
             return false;
         }
 
-        private void Sum()
+        private double Sum(double a, double b)
         {
-
+            return a + b;
         }
 
-        private void Sub()
+        private double Sub(double a, double b)
         {
-
+            return b - a;
         }
 
-        private void Division()
+        private double Division(double a, double b)
         {
-
+            return a / b;
         }
 
-        private void Multiplication()
+        private double Multiplication(double a, double b)
         {
-
+            return b * a;
         }
     }
 }
