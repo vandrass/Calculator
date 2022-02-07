@@ -4,12 +4,21 @@ using System.Text;
 
 namespace Calculator.Application
 {
+    /// <summary>
+    /// Class parse string expression from user or file and calculate them.
+    /// </summary>
     public class Calculate : ICalculate
     {
         private EnumErrors enumErrors = EnumErrors.None;
         private List<double> numbers = new List<double>();
         private ArrayList operators = new ArrayList();
 
+        /// <summary>
+        /// Calculate expression string from user.
+        /// </summary>
+        /// <param name="expression">string from user.</param>
+        /// <param name="result">resukt if calculation.</param>
+        /// <returns>return errors enum.</returns>
         public EnumErrors CalculateManualExpression(string expression, ref double result)
         {
             ParseString(expression);
@@ -19,7 +28,7 @@ namespace Calculator.Application
                 return enumErrors;
             }
 
-            if (operators.Count == 0)
+            if (operators.Count == 0 || operators.Count != numbers.Count - 1)
             {
                 return EnumErrors.NoOperators;
             }
@@ -120,7 +129,7 @@ namespace Calculator.Application
                         }
                     }
 
-                    if (i != stringLenth - 1)
+                    if (i != stringLenth - 1 && expression[i] != ' ')
                     {
                         operators.Add(expression[i]);
                     }
@@ -158,7 +167,7 @@ namespace Calculator.Application
 
         private bool IsDigit(char ch)
         {
-            if (ch != '+' && ch != '-' && ch != '*' && ch != '/')
+            if (ch != '+' && ch != '-' && ch != '*' && ch != '/' && ch != ' ')
             {
                 return true;
             }
@@ -173,7 +182,7 @@ namespace Calculator.Application
 
         private double Sub(double a, double b)
         {
-            return b - a;
+            return a - b;
         }
 
         private double Division(double a, double b)

@@ -25,7 +25,7 @@ namespace Calculator.UI
                 errors = service.CalculateManualExpression(expression, ref result);
                 if (errors == EnumErrors.Success)
                 {
-                    Console.WriteLine(result);
+                    Console.WriteLine(expression + "=" + result);
                 }
                 else
                 {
