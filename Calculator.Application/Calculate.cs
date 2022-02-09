@@ -112,12 +112,30 @@ namespace Calculator.Application
         {
             var stringLenth = expression.Length;
             var strBuilder = new StringBuilder();
+            int operatorsCounter = 0;
 
             for (int i = 0; i < stringLenth; i++)
             {
                 if (IsDigit(expression[i]))
                 {
-                    strBuilder.Append(expression[i]);
+                    if (operatorsCounter == 1 && i == 1)
+                    {
+                        strBuilder.Append('-');
+                        strBuilder.Append(expression[i]);
+                        operators.RemoveAt(operators.Count - 1);
+                    }
+                    else if (operatorsCounter == 2)
+                    {
+                        strBuilder.Append('-');
+                        strBuilder.Append(expression[i]);
+                        operators.RemoveAt(operators.Count - 1);
+                    }
+                    else
+                    {
+                        strBuilder.Append(expression[i]);
+                    }
+
+                    operatorsCounter = 0;
                 }
                 else
                 {
@@ -132,6 +150,13 @@ namespace Calculator.Application
                     if (i != stringLenth - 1 && expression[i] != ' ')
                     {
                         operators.Add(expression[i]);
+
+                        operatorsCounter++;
+
+                        if (operatorsCounter == 2 && expression[i] != '-')
+                        {
+                            operatorsCounter = 0;
+                        }
                     }
                 }
 
