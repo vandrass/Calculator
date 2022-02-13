@@ -4,6 +4,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Calculator.UnitTests
 {
+    /// <summary>
+    /// Tests for CalculateManualExpression method.
+    /// </summary>
     [TestClass]
     public class CalculateManualExpressionTests
     {
