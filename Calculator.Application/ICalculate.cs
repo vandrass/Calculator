@@ -4,6 +4,6 @@
     {
         public EnumErrors CalculateManualExpression(string expression, ref double result);
 
-        public EnumErrors CalculateFileExpressions(string path);
+        public bool CalculateFileExpressions(string path);
     }
 }

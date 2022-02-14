@@ -40,9 +40,14 @@ namespace Calculator.Application
             return enumErrors;
         }
 
-        public EnumErrors CalculateFileExpressions(string path)
+        /// <summary>
+        /// Read file, calculate expressions from him and save expressions with ansewrs to new file.
+        /// </summary>
+        /// <param name="path">path to file for reading.</param>
+        /// <returns>true - if file saved successfully, false - if file was not saved.</returns>
+        public bool CalculateFileExpressions(string path)
         {
-            return enumErrors;
+            return true;
         }
 
         private void Calculating()

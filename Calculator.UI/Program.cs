@@ -11,7 +11,6 @@ namespace Calculator.UI
         {
             char mode = ChooseCalcMode();
             string expression;
-            string path;
             double result = 0;
             EnumErrors errors = EnumErrors.None;
             var serviceCollection = new ServiceCollection();
@@ -34,7 +33,7 @@ namespace Calculator.UI
             }
             else
             {
-                path = EnterPathToFile();
+                service.CalculateFileExpressions(EnterPathToFile());
             }
         }
 
@@ -52,7 +51,7 @@ namespace Calculator.UI
             {
                 Console.Write("Enter Path to File: ");
                 path = Console.ReadLine();
-                Console.WriteLine(File.Exists(path) ? "File exists" : "File doesn't exist!");
+                Console.WriteLine(File.Exists(path) ? " " : "File doesn't exist!");
             }
             while (!File.Exists(path));
 
