@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Calculator.Application
@@ -47,7 +48,44 @@ namespace Calculator.Application
         /// <returns>true - if file saved successfully, false - if file was not saved.</returns>
         public bool CalculateFileExpressions(string path)
         {
+            List<string> expressionsList = new List<string>();
+
+            GetExpressionsFromFile(expressionsList, path);
+
+            foreach (var expression in expressionsList)
+            {
+                WriteAnswerToNewFile(expression, path);
+            }
+
             return true;
+        }
+
+        private void GetExpressionsFromFile(List<string> expressionsList, string path)
+        {
+
+            foreach (string line in File.ReadLines(path))
+            {
+                expressionsList.Add(line);
+            }
+        }
+
+        private void WriteAnswerToNewFile(string expression, string path)
+        {
+            string answerFilePath = path + "answer.txt";
+            if (!File.Exists(answerFilePath))
+            {
+                using (var streamWriter = new StreamWriter(answerFilePath))
+                {
+                    streamWriter.WriteLine(expression + "=" + "success");
+                }
+            }
+            else
+            {
+                using (var streamWriter = new StreamWriter(answerFilePath, append:true))
+                {
+                    streamWriter.WriteLine(expression + "=" + "success");
+                }
+            }
         }
 
         private void Calculating()
@@ -197,7 +235,7 @@ namespace Calculator.Application
 
         private bool IsDigit(char ch)
         {
-            if (ch != '+' && ch != '-' && ch != '*' && ch != '/' && ch != ' ')
+            if (ch != '+' && ch != '-' && ch != '*' && ch != '/' && ch != ' ' && ch != '(' && ch != ')')
             {
                 return true;
             }
