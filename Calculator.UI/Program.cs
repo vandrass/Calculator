@@ -12,7 +12,7 @@ namespace Calculator.UI
             char mode = ChooseCalcMode();
             string expression;
             double result = 0;
-            EnumErrors errors = EnumErrors.None;
+            EnumErrors errors;
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddScoped<ICalculate, Calculate>();
             var provider = serviceCollection.BuildServiceProvider();

@@ -62,7 +62,6 @@ namespace Calculator.Application
 
         private void GetExpressionsFromFile(List<string> expressionsList, string path)
         {
-
             foreach (string line in File.ReadLines(path))
             {
                 expressionsList.Add(line);
@@ -74,14 +73,14 @@ namespace Calculator.Application
             string answerFilePath = path + "answer.txt";
             if (!File.Exists(answerFilePath))
             {
-                using (var streamWriter = new StreamWriter(answerFilePath))
+                using var streamWriter = new StreamWriter(answerFilePath);
                 {
                     streamWriter.WriteLine(expression + "=" + "success");
                 }
             }
             else
             {
-                using (var streamWriter = new StreamWriter(answerFilePath, append:true))
+                using var streamWriter = new StreamWriter(answerFilePath, append: true);
                 {
                     streamWriter.WriteLine(expression + "=" + "success");
                 }
@@ -90,7 +89,7 @@ namespace Calculator.Application
 
         private void Calculating()
         {
-            double result = 0;
+            double result;
 
             while (operators.Count > 0)
             {
@@ -212,11 +211,9 @@ namespace Calculator.Application
 
         private bool ParseNumber(StringBuilder strBuilder)
         {
-            double parseNumber;
-
             if (strBuilder.Length > 0)
             {
-                if (double.TryParse(strBuilder.ToString().Trim(), out parseNumber))
+                if (double.TryParse(strBuilder.ToString().Trim(), out double parseNumber))
                 {
                     numbers.Add(parseNumber);
 
