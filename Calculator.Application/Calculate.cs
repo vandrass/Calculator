@@ -24,19 +24,12 @@ namespace Calculator.Application
         {
             ParseString(expression);
 
-            if (enumErrors == EnumErrors.NotCorrectExpression)
-            {
-                return enumErrors;
-            }
-
-            if (operators.Count == 0 || operators.Count != numbers.Count - 1)
-            {
-                return EnumErrors.NoOperators;
-            }
-
             Calculating();
 
-            result = numbers[0];
+            if (enumErrors == EnumErrors.Success)
+            {
+                result = numbers[0];
+            }
 
             return enumErrors;
         }
@@ -48,24 +41,29 @@ namespace Calculator.Application
         /// <returns>true - if file saved successfully, false - if file was not saved.</returns>
         public bool CalculateFileExpressions(string path)
         {
-            List<string> expressionsList = new List<string>();
-
-            GetExpressionsFromFile(expressionsList, path);
+            List<string> expressionsList = GetExpressionsFromFile(path);
 
             foreach (var expression in expressionsList)
             {
+                ParseString(expression);
+                Calculating();
                 WriteAnswerToNewFile(expression, path);
+                ResetObjectFields();
             }
 
             return true;
         }
 
-        private void GetExpressionsFromFile(List<string> expressionsList, string path)
+        private List<string> GetExpressionsFromFile(string path)
         {
+            var expressionsList = new List<string>();
+
             foreach (string line in File.ReadLines(path))
             {
                 expressionsList.Add(line);
             }
+
+            return expressionsList;
         }
 
         private void WriteAnswerToNewFile(string expression, string path)
@@ -75,21 +73,49 @@ namespace Calculator.Application
             {
                 using var streamWriter = new StreamWriter(answerFilePath);
                 {
-                    streamWriter.WriteLine(expression + "=" + "success");
+                    streamWriter.WriteLine(GetRightAnswer(expression));
                 }
             }
             else
             {
                 using var streamWriter = new StreamWriter(answerFilePath, append: true);
                 {
-                    streamWriter.WriteLine(expression + "=" + "success");
+                    streamWriter.WriteLine(GetRightAnswer(expression));
                 }
             }
+        }
+
+        private string GetRightAnswer(string expression)
+        {
+            if (enumErrors == EnumErrors.Success)
+            {
+                return expression + "=" + numbers[0];
+            }
+            else if (enumErrors == EnumErrors.DivisionByZero)
+            {
+                return expression + " = " + "Division By Zero!";
+            }
+            else if (enumErrors == EnumErrors.NotCorrectExpression)
+            {
+                return expression + " = " + "Expression isn`t Correct!";
+            }
+            else if (enumErrors == EnumErrors.NoOperators)
+            {
+                return expression + " = " + "Operators Error!";
+            }
+
+            return "Empty String";
         }
 
         private void Calculating()
         {
             double result;
+
+            CheckExpressionCorrection();
+            if (enumErrors != EnumErrors.Correct)
+            {
+                return;
+            }
 
             while (operators.Count > 0)
             {
@@ -141,6 +167,25 @@ namespace Calculator.Application
             }
 
             enumErrors = EnumErrors.Success;
+        }
+
+        private void CheckExpressionCorrection()
+        {
+            if (enumErrors == EnumErrors.None)
+            {
+                if (numbers.Count < 1)
+                {
+                    enumErrors = EnumErrors.None;
+                }
+                else if (operators.Count == 0 || operators.Count != numbers.Count - 1)
+                {
+                    enumErrors = EnumErrors.NoOperators;
+                }
+                else
+                {
+                    enumErrors = EnumErrors.Correct;
+                }
+            }
         }
 
         private void InsertAndRemove(double result, int i)
@@ -228,6 +273,13 @@ namespace Calculator.Application
             }
 
             return false;
+        }
+
+        private void ResetObjectFields()
+        {
+            numbers.Clear();
+            operators.Clear();
+            enumErrors = EnumErrors.None;
         }
 
         private bool IsDigit(char ch)

@@ -1,4 +1,0 @@
-2+3+6=success
-45+98*85*5=success
-47-9/8+6=success
-123/852=success

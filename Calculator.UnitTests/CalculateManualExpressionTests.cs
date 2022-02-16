@@ -10,7 +10,7 @@ namespace Calculator.UnitTests
     [TestClass]
     public class CalculateManualExpressionTests
     {
-        private readonly ServiceCollection _serviceCollection;
+        private readonly ServiceCollection _serviceCollection = new();
         private ServiceProvider _serviceProvider;
         private ICalculate _service;
 

@@ -11,6 +11,11 @@
         None,
 
         /// <summary>
+        /// For Checking before calculating that expression is correct.
+        /// </summary>
+        Correct,
+
+        /// <summary>
         /// If is division by zero.
         /// </summary>
         DivisionByZero,
