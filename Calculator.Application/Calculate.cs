@@ -205,7 +205,7 @@ namespace Calculator.Application
             {
                 if (IsDigit(expression[i]))
                 {
-                    if (operatorsCounter == 1 && i == 1)
+                    if (operatorsCounter == 1 && (char)operators[0] == '-' && i == 1)
                     {
                         strBuilder.Append('-');
                         strBuilder.Append(expression[i]);

@@ -44,6 +44,24 @@ namespace Calculator.UnitTests
         }
 
         /// <summary>
+        /// Check string exepression with correct input and correct result of exeption.
+        /// </summary>
+        [TestMethod]
+        public void StringExpression_FirstCharIsMinus_CorrectResult()
+        {
+            // Arrange
+            var expression = "-1 + 2 - 3 * 10 / 5";
+            var expected = -5;
+
+            // Act
+            var actual = 0.0;
+            _service.CalculateManualExpression(expression, ref actual);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
         /// Check string expression with correct input and correct result, EnumErrors will be "success" .
         /// </summary>
         [TestMethod]
