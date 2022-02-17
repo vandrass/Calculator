@@ -5,8 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Calculator.UI
 {
+    /// <summary>
+    /// Console UI of Calculator, for expressions input,  manual or from file.
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// Main method, with mode choosing for expressions input.
+        /// </summary>
         public static void Main()
         {
             char mode = ChooseCalcMode();

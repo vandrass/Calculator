@@ -10,7 +10,7 @@ namespace Calculator.UnitTests
     [TestClass]
     public class CalculateManualExpressionTests
     {
-        private readonly ServiceCollection _serviceCollection = new();
+        private readonly ServiceCollection _serviceCollection = new ();
         private ServiceProvider _serviceProvider;
         private ICalculate _service;
 
@@ -106,6 +106,24 @@ namespace Calculator.UnitTests
             // Arrange
             var expression = "1 + 2 - 3 * 10   9";
             var expected = EnumErrors.NoOperators;
+            var result = 0.0;
+
+            // Act
+            var actual = _service.CalculateManualExpression(expression, ref result);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Check string expression with empty input, EnumErrors will be "None" .
+        /// </summary>
+        [TestMethod]
+        public void StringExpression_EmptyString_EnumNone()
+        {
+            // Arrange
+            var expression = " ";
+            var expected = EnumErrors.None;
             var result = 0.0;
 
             // Act
