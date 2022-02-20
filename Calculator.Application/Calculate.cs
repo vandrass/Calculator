@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Calculator.Application
 {
@@ -42,7 +43,7 @@ namespace Calculator.Application
 
             BuildOutputArray();
 
-            foreach(var output in _outputString)
+            foreach (var output in _outputString)
             {
                 Console.WriteLine(output);
             }
@@ -134,16 +135,23 @@ namespace Calculator.Application
         private void ParseString(string expression)
         {
             var stringLenth = expression.Length;
+            var strBuilder = new StringBuilder();
 
             for (int i = 0; i < stringLenth; i++)
             {
                 if (char.IsDigit(expression[i]))
                 {
-                    _inputString.Add((double)expression[i]);
-                    _numbersCount++;
+                    strBuilder.Append(expression[i]);
                 }
                 else
                 {
+                    if (strBuilder.Length > 0)
+                    {
+                        _inputString.Add(double.Parse(strBuilder.ToString()));
+                        _numbersCount++;
+                        strBuilder.Clear();
+                    }
+
                     ParseOperator(expression[i]);
                 }
             }
