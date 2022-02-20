@@ -12,23 +12,25 @@ namespace Calculator.Application
     public class Calculate : ICalculate
     {
         private EnumErrors _enumErrors = EnumErrors.None;
-        private ArrayList _inputString = new ArrayList();
-        private ArrayList _outputString = new ArrayList();
+        private ArrayList _inputArray = new ArrayList();
+        private ArrayList _outputArray = new ArrayList();
         private Stack _operationsStack = new Stack();
         private int _numbersCount = 0;
         private int _operatorsCount = 0;
+        private int openBraces = 0;
+        private int closeBraces = 0;
 
         private List<double> _numbers = new List<double>();
         private ArrayList _operators = new ArrayList();
         private bool _withParentheses;
         private Dictionary<char, int> _operatorsPriority = new Dictionary<char, int>()
         {
-            ['('] = 5,
-            [')'] = 5,
             ['*'] = 4,
             ['/'] = 4,
             ['-'] = 3,
             ['+'] = 3,
+            ['('] = 2,
+            [')'] = 2,
         };
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace Calculator.Application
 
             BuildOutputArray();
 
-            foreach (var output in _outputString)
+            foreach (var output in _outputArray)
             {
                 Console.WriteLine(output);
             }
@@ -142,12 +144,19 @@ namespace Calculator.Application
                 if (char.IsDigit(expression[i]))
                 {
                     strBuilder.Append(expression[i]);
+
+                    if (i == stringLenth - 1)
+                    {
+                        _inputArray.Add(double.Parse(strBuilder.ToString()));
+                        _numbersCount++;
+                        strBuilder.Clear();
+                    }
                 }
                 else
                 {
                     if (strBuilder.Length > 0)
                     {
-                        _inputString.Add(double.Parse(strBuilder.ToString()));
+                        _inputArray.Add(double.Parse(strBuilder.ToString()));
                         _numbersCount++;
                         strBuilder.Clear();
                     }
@@ -161,10 +170,15 @@ namespace Calculator.Application
         {
             if (oper == '(' || oper == ')' || oper == '/' || oper == '*' || oper == '-' || oper == '+')
             {
-                _inputString.Add(oper);
+                _inputArray.Add(oper);
+
                 if (oper != '(' || oper != ')')
                 {
                     _operatorsCount++;
+                }
+                else if (oper == '(')
+                {
+                    openBraces
                 }
             }
             else if (oper != ' ')
@@ -265,36 +279,62 @@ namespace Calculator.Application
         {
             var priority = _operatorsPriority;
             var stack = _operationsStack;
-            int openBrace = 0;
-            int closeBrace = 0;
+            
 
-            foreach (var input in _inputString)
+            for (var i = 0; i < _inputArray.Count; i++)
             {
-                Type t = input.GetType();
+                Type t = _inputArray[i].GetType();
 
                 if (t.Equals(typeof(double)))
                 {
-                    _outputString.Add(input);
+                    _outputArray.Add(_inputArray[i]);
                 }
                 else
                 {
-                    if (stack.Count < 1)
+                    if ((char)_inputArray[i] == '(')
                     {
-                        stack.Push(input);
+                        stack.Push(_inputArray[i]);
+                    }
+                    else if ((char)_inputArray[i] == ')')
+                    {
+                        char temp = (char)stack.Pop();
+
+                        while (temp != '(')
+                        {
+                            _outputArray.Add(temp);
+                            temp = (char)stack.Pop();
+                        }
+                    }
+                    else if (stack.Count < 1)
+                    {
+                        stack.Push(_inputArray[i]);
                     }
                     else
                     {
-                        if (priority[(char)stack.Peek()] >= priority[(char)input])
+                        if (priority[(char)stack.Peek()] >= priority[(char)_inputArray[i]])
                         {
-                            _outputString.Add(stack.Pop());
-                            stack.Push(input);
+                            _outputArray.Add(stack.Pop());
+                            stack.Push(_inputArray[i]);
                         }
                         else
                         {
-                            stack.Push(input);
+                            stack.Push(_inputArray[i]);
                         }
                     }
                 }
+
+                if (i == _inputArray.Count - 1)
+                {
+                    while (stack.Count > 0)
+                    {
+                        _outputArray.Add(stack.Pop());
+                    }
+                }
+            }
+
+            if (openBraces != 0 && closeBraces != 0)
+            {
+                _enumErrors = EnumErrors.NotCorrectExpression;
             }
         }
 
