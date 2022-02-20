@@ -69,7 +69,7 @@ namespace Calculator.UnitTests
         {
             // Arrange
             var expression = "1 + 2 - 3 * 10 / 5-";
-            var expected = EnumErrors.NoOperators;
+            var expected = EnumErrors.OperatorsError;
             var result = 0.0;
 
             // Act
@@ -141,7 +141,7 @@ namespace Calculator.UnitTests
         {
             // Arrange
             var expression = "1 + 2 - 3 * 10   9";
-            var expected = EnumErrors.NoOperators;
+            var expected = EnumErrors.OperatorsError;
             var result = 0.0;
 
             // Act

@@ -23,7 +23,7 @@
         /// <summary>
         /// If No Math Operators.
         /// </summary>
-        NoOperators,
+        OperatorsError,
 
         /// <summary>
         /// If there are not correct symbols(e.g. letters ).

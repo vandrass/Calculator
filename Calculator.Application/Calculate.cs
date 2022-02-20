@@ -11,6 +11,11 @@ namespace Calculator.Application
     public class Calculate : ICalculate
     {
         private EnumErrors _enumErrors = EnumErrors.None;
+        private ArrayList _inputString = new ArrayList();
+        private ArrayList _outputString = new ArrayList();
+        private int _numbersCount = 0;
+        private int _operatorsCount = 0;
+
         private List<double> _numbers = new List<double>();
         private ArrayList _operators = new ArrayList();
         private bool _withParentheses;
@@ -110,12 +115,46 @@ namespace Calculator.Application
             {
                 return expression + " = " + "Expression isn`t Correct!";
             }
-            else if (_enumErrors == EnumErrors.NoOperators)
+            else if (_enumErrors == EnumErrors.OperatorsError)
             {
                 return expression + " = " + "Operators Error!";
             }
 
             return "Empty String";
+        }
+
+        private void ParseString(string expression)
+        {
+            var stringLenth = expression.Length;
+
+            for (int i = 0; i < stringLenth; i++)
+            {
+                if (char.IsDigit(expression[i]))
+                {
+                    _inputString.Add((double)expression[i]);
+                    _numbersCount++;
+                }
+                else
+                {
+                    ParseOperator(expression[i]);
+                }
+            }
+        }
+
+        private void ParseOperator(char oper)
+        {
+            if (oper == '(' || oper == ')' || oper == '/' || oper == '*' || oper == '-' || oper == '+')
+            {
+                _inputString.Add(oper);
+                if (oper != '(' || oper != ')')
+                {
+                    _operatorsCount++;
+                }
+            }
+            else if (oper != ' ')
+            {
+                _enumErrors = EnumErrors.NotCorrectExpression;
+            }
         }
 
         private void Calculating()
@@ -184,13 +223,13 @@ namespace Calculator.Application
         {
             if (_enumErrors == EnumErrors.None)
             {
-                if (_numbers.Count < 1)
+                if (_numbersCount < 1)
                 {
                     _enumErrors = EnumErrors.None;
                 }
-                else if (_operators.Count == 0 || _operators.Count != _numbers.Count - 1)
+                else if (_operatorsCount == 0 || _operatorsCount != _numbersCount - 1)
                 {
-                    _enumErrors = EnumErrors.NoOperators;
+                    _enumErrors = EnumErrors.OperatorsError;
                 }
                 else
                 {
@@ -206,122 +245,11 @@ namespace Calculator.Application
             _operators.RemoveAt(i);
         }
 
-        private void ParseString(string expression)
-        {
-            var stringLenth = expression.Length;
-            var strBuilder = new StringBuilder();
-            int operatorsCounter = 0;
-
-            for (int i = 0; i < stringLenth; i++)
-            {
-                if (IsDigit(expression[i]))
-                {
-                    if (operatorsCounter == 1 && (char)_operators[0] == '-' && i == 1)
-                    {
-                        strBuilder.Append('-');
-                        strBuilder.Append(expression[i]);
-                        _operators.RemoveAt(_operators.Count - 1);
-                    }
-                    else if (operatorsCounter == 2)
-                    {
-                        strBuilder.Append('-');
-                        strBuilder.Append(expression[i]);
-                        _operators.RemoveAt(_operators.Count - 1);
-                    }
-                    else
-                    {
-                        strBuilder.Append(expression[i]);
-                    }
-
-                    operatorsCounter = 0;
-                }
-                else
-                {
-                    if (!ParseNumber(strBuilder))
-                    {
-                        if (_enumErrors == EnumErrors.NotCorrectExpression)
-                        {
-                            return;
-                        }
-                    }
-
-                    ParseOperator(expression, i, ref operatorsCounter);
-                }
-
-                if (i == stringLenth - 1)
-                {
-                    ParseNumber(strBuilder);
-                }
-            }
-        }
-
-        private void ParseOperator(string expression, int i, ref int operatorsCounter)
-        {
-            if (expression[i] != ' ' && expression[i] != '(' && expression[i] != ')')
-            {
-                _operators.Add(expression[i]);
-
-                operatorsCounter++;
-
-                if (operatorsCounter == 2 && expression[i] != '-')
-                {
-                    operatorsCounter = 0;
-                }
-            }
-            else if (expression[i] == '(' || expression[i] == ')')
-            {
-                if (_numbers.Count != 0)
-                {
-                }
-                else
-                {
-                }
-            }
-        }
-
-        private bool ParseNumber(StringBuilder strBuilder)
-        {
-            if (strBuilder.Length > 0)
-            {
-                if (double.TryParse(strBuilder.ToString().Trim(), out double parseNumber))
-                {
-                    _numbers.Add(parseNumber);
-
-                    strBuilder.Clear();
-
-                    return true;
-                }
-
-                _enumErrors = EnumErrors.NotCorrectExpression;
-
-                return false;
-            }
-
-            return false;
-        }
-
         private void ResetObjectFields()
         {
             _numbers.Clear();
             _operators.Clear();
             _enumErrors = EnumErrors.None;
-        }
-
-        private bool IsDigit(char ch)
-        {
-            if (_withParentheses)
-            {
-                if (ch != '+' && ch != '-' && ch != '*' && ch != '/' && ch != ' ' && ch != '(' && ch != ')')
-                {
-                    return true;
-                }
-            }
-            else if (ch != '+' && ch != '-' && ch != '*' && ch != '/' && ch != ' ')
-            {
-                return true;
-            }
-
-            return false;
         }
 
         private double Sum(double a, double b)
