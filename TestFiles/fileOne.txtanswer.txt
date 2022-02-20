@@ -1,0 +1,10 @@
+Empty String
+3-3-6=-6
+2*2*3=12
+2/2*5=5
+4++6++8**1 = Operators Error!
+4 6 8+7 = Operators Error!
+4+a+2 = Expression isn`t Correct!
+4+10*5/5=14
+47-9/8+6=39,875
+123/0 = Division By Zero!

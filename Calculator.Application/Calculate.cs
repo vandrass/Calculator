@@ -10,9 +10,19 @@ namespace Calculator.Application
     /// </summary>
     public class Calculate : ICalculate
     {
-        private EnumErrors enumErrors = EnumErrors.None;
-        private List<double> numbers = new List<double>();
-        private ArrayList operators = new ArrayList();
+        private EnumErrors _enumErrors = EnumErrors.None;
+        private List<double> _numbers = new List<double>();
+        private ArrayList _operators = new ArrayList();
+        private bool _withParentheses;
+        private Dictionary<char, int> _operatorsPriority = new Dictionary<char, int>()
+        {
+            ['('] = 5,
+            [')'] = 5,
+            ['*'] = 4,
+            ['/'] = 4,
+            ['-'] = 3,
+            ['+'] = 3,
+        };
 
         /// <summary>
         /// Calculate expression string from user.
@@ -26,12 +36,12 @@ namespace Calculator.Application
 
             Calculating();
 
-            if (enumErrors == EnumErrors.Success)
+            if (_enumErrors == EnumErrors.Success)
             {
-                result = numbers[0];
+                result = _numbers[0];
             }
 
-            return enumErrors;
+            return _enumErrors;
         }
 
         /// <summary>
@@ -45,6 +55,7 @@ namespace Calculator.Application
 
             foreach (var expression in expressionsList)
             {
+                _withParentheses = true;
                 ParseString(expression);
                 Calculating();
                 WriteAnswerToNewFile(expression, path);
@@ -87,19 +98,19 @@ namespace Calculator.Application
 
         private string GetRightAnswer(string expression)
         {
-            if (enumErrors == EnumErrors.Success)
+            if (_enumErrors == EnumErrors.Success)
             {
-                return expression + "=" + numbers[0];
+                return expression + "=" + _numbers[0];
             }
-            else if (enumErrors == EnumErrors.DivisionByZero)
+            else if (_enumErrors == EnumErrors.DivisionByZero)
             {
                 return expression + " = " + "Division By Zero!";
             }
-            else if (enumErrors == EnumErrors.NotCorrectExpression)
+            else if (_enumErrors == EnumErrors.NotCorrectExpression)
             {
                 return expression + " = " + "Expression isn`t Correct!";
             }
-            else if (enumErrors == EnumErrors.NoOperators)
+            else if (_enumErrors == EnumErrors.NoOperators)
             {
                 return expression + " = " + "Operators Error!";
             }
@@ -112,87 +123,87 @@ namespace Calculator.Application
             double result;
 
             CheckExpressionCorrection();
-            if (enumErrors != EnumErrors.Correct)
+            if (_enumErrors != EnumErrors.Correct)
             {
                 return;
             }
 
-            while (operators.Count > 0)
+            while (_operators.Count > 0)
             {
-                for (int i = 0; i < operators.Count; i++)
+                for (int i = 0; i < _operators.Count; i++)
                 {
-                    if ((char)operators[i] == '/')
+                    if ((char)_operators[i] == '/')
                     {
-                        if (numbers[i + 1] == 0)
+                        if (_numbers[i + 1] == 0)
                         {
-                            enumErrors = EnumErrors.DivisionByZero;
+                            _enumErrors = EnumErrors.DivisionByZero;
                             return;
                         }
 
-                        result = Division(numbers[i], numbers[i + 1]);
+                        result = Division(_numbers[i], _numbers[i + 1]);
                         InsertAndRemove(result, i);
                         i--;
                     }
                 }
 
-                for (int i = 0; i < operators.Count; i++)
+                for (int i = 0; i < _operators.Count; i++)
                 {
-                    if ((char)operators[i] == '*')
+                    if ((char)_operators[i] == '*')
                     {
-                        result = Multiplication(numbers[i], numbers[i + 1]);
+                        result = Multiplication(_numbers[i], _numbers[i + 1]);
                         InsertAndRemove(result, i);
                         i--;
                     }
                 }
 
-                for (int i = 0; i < operators.Count; i++)
+                for (int i = 0; i < _operators.Count; i++)
                 {
-                    if ((char)operators[i] == '+')
+                    if ((char)_operators[i] == '+')
                     {
-                        result = Sum(numbers[i], numbers[i + 1]);
+                        result = Sum(_numbers[i], _numbers[i + 1]);
                         InsertAndRemove(result, i);
                         i--;
                     }
                 }
 
-                for (int i = 0; i < operators.Count; i++)
+                for (int i = 0; i < _operators.Count; i++)
                 {
-                    if ((char)operators[i] == '-')
+                    if ((char)_operators[i] == '-')
                     {
-                        result = Sub(numbers[i], numbers[i + 1]);
+                        result = Sub(_numbers[i], _numbers[i + 1]);
                         InsertAndRemove(result, i);
                         i--;
                     }
                 }
             }
 
-            enumErrors = EnumErrors.Success;
+            _enumErrors = EnumErrors.Success;
         }
 
         private void CheckExpressionCorrection()
         {
-            if (enumErrors == EnumErrors.None)
+            if (_enumErrors == EnumErrors.None)
             {
-                if (numbers.Count < 1)
+                if (_numbers.Count < 1)
                 {
-                    enumErrors = EnumErrors.None;
+                    _enumErrors = EnumErrors.None;
                 }
-                else if (operators.Count == 0 || operators.Count != numbers.Count - 1)
+                else if (_operators.Count == 0 || _operators.Count != _numbers.Count - 1)
                 {
-                    enumErrors = EnumErrors.NoOperators;
+                    _enumErrors = EnumErrors.NoOperators;
                 }
                 else
                 {
-                    enumErrors = EnumErrors.Correct;
+                    _enumErrors = EnumErrors.Correct;
                 }
             }
         }
 
         private void InsertAndRemove(double result, int i)
         {
-            numbers.Insert(i, result);
-            numbers.RemoveRange(i + 1, 2);
-            operators.RemoveAt(i);
+            _numbers.Insert(i, result);
+            _numbers.RemoveRange(i + 1, 2);
+            _operators.RemoveAt(i);
         }
 
         private void ParseString(string expression)
@@ -205,17 +216,17 @@ namespace Calculator.Application
             {
                 if (IsDigit(expression[i]))
                 {
-                    if (operatorsCounter == 1 && (char)operators[0] == '-' && i == 1)
+                    if (operatorsCounter == 1 && (char)_operators[0] == '-' && i == 1)
                     {
                         strBuilder.Append('-');
                         strBuilder.Append(expression[i]);
-                        operators.RemoveAt(operators.Count - 1);
+                        _operators.RemoveAt(_operators.Count - 1);
                     }
                     else if (operatorsCounter == 2)
                     {
                         strBuilder.Append('-');
                         strBuilder.Append(expression[i]);
-                        operators.RemoveAt(operators.Count - 1);
+                        _operators.RemoveAt(_operators.Count - 1);
                     }
                     else
                     {
@@ -228,28 +239,42 @@ namespace Calculator.Application
                 {
                     if (!ParseNumber(strBuilder))
                     {
-                        if (enumErrors == EnumErrors.NotCorrectExpression)
+                        if (_enumErrors == EnumErrors.NotCorrectExpression)
                         {
                             return;
                         }
                     }
 
-                    if (i != stringLenth - 1 && expression[i] != ' ')
-                    {
-                        operators.Add(expression[i]);
-
-                        operatorsCounter++;
-
-                        if (operatorsCounter == 2 && expression[i] != '-')
-                        {
-                            operatorsCounter = 0;
-                        }
-                    }
+                    ParseOperator(expression, i, ref operatorsCounter);
                 }
 
                 if (i == stringLenth - 1)
                 {
                     ParseNumber(strBuilder);
+                }
+            }
+        }
+
+        private void ParseOperator(string expression, int i, ref int operatorsCounter)
+        {
+            if (expression[i] != ' ' && expression[i] != '(' && expression[i] != ')')
+            {
+                _operators.Add(expression[i]);
+
+                operatorsCounter++;
+
+                if (operatorsCounter == 2 && expression[i] != '-')
+                {
+                    operatorsCounter = 0;
+                }
+            }
+            else if (expression[i] == '(' || expression[i] == ')')
+            {
+                if (_numbers.Count != 0)
+                {
+                }
+                else
+                {
                 }
             }
         }
@@ -260,14 +285,14 @@ namespace Calculator.Application
             {
                 if (double.TryParse(strBuilder.ToString().Trim(), out double parseNumber))
                 {
-                    numbers.Add(parseNumber);
+                    _numbers.Add(parseNumber);
 
                     strBuilder.Clear();
 
                     return true;
                 }
 
-                enumErrors = EnumErrors.NotCorrectExpression;
+                _enumErrors = EnumErrors.NotCorrectExpression;
 
                 return false;
             }
@@ -277,14 +302,21 @@ namespace Calculator.Application
 
         private void ResetObjectFields()
         {
-            numbers.Clear();
-            operators.Clear();
-            enumErrors = EnumErrors.None;
+            _numbers.Clear();
+            _operators.Clear();
+            _enumErrors = EnumErrors.None;
         }
 
         private bool IsDigit(char ch)
         {
-            if (ch != '+' && ch != '-' && ch != '*' && ch != '/' && ch != ' ' && ch != '(' && ch != ')')
+            if (_withParentheses)
+            {
+                if (ch != '+' && ch != '-' && ch != '*' && ch != '/' && ch != ' ' && ch != '(' && ch != ')')
+                {
+                    return true;
+                }
+            }
+            else if (ch != '+' && ch != '-' && ch != '*' && ch != '/' && ch != ' ')
             {
                 return true;
             }

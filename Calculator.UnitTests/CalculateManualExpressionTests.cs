@@ -65,6 +65,24 @@ namespace Calculator.UnitTests
         /// Check string expression with correct input and correct result, EnumErrors will be "success" .
         /// </summary>
         [TestMethod]
+        public void StringExpression_InCorrectExpression_EnumNoOperators()
+        {
+            // Arrange
+            var expression = "1 + 2 - 3 * 10 / 5-";
+            var expected = EnumErrors.NoOperators;
+            var result = 0.0;
+
+            // Act
+            var actual = _service.CalculateManualExpression(expression, ref result);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Check string expression with correct input and correct result, EnumErrors will be "success" .
+        /// </summary>
+        [TestMethod]
         public void StringExpression_CorrectExpression_EnumSuccess()
         {
             // Arrange
