@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Calculator.Application
 {
@@ -13,6 +13,7 @@ namespace Calculator.Application
         private EnumErrors _enumErrors = EnumErrors.None;
         private ArrayList _inputString = new ArrayList();
         private ArrayList _outputString = new ArrayList();
+        private Stack _operationsStack = new Stack();
         private int _numbersCount = 0;
         private int _operatorsCount = 0;
 
@@ -38,6 +39,13 @@ namespace Calculator.Application
         public EnumErrors CalculateManualExpression(string expression, ref double result)
         {
             ParseString(expression);
+
+            BuildOutputArray();
+
+            foreach(var output in _outputString)
+            {
+                Console.WriteLine(output);
+            }
 
             Calculating();
 
@@ -243,6 +251,43 @@ namespace Calculator.Application
             _numbers.Insert(i, result);
             _numbers.RemoveRange(i + 1, 2);
             _operators.RemoveAt(i);
+        }
+
+        private void BuildOutputArray()
+        {
+            var priority = _operatorsPriority;
+            var stack = _operationsStack;
+            int openBrace = 0;
+            int closeBrace = 0;
+
+            foreach (var input in _inputString)
+            {
+                Type t = input.GetType();
+
+                if (t.Equals(typeof(double)))
+                {
+                    _outputString.Add(input);
+                }
+                else
+                {
+                    if (stack.Count < 1)
+                    {
+                        stack.Push(input);
+                    }
+                    else
+                    {
+                        if (priority[(char)stack.Peek()] >= priority[(char)input])
+                        {
+                            _outputString.Add(stack.Pop());
+                            stack.Push(input);
+                        }
+                        else
+                        {
+                            stack.Push(input);
+                        }
+                    }
+                }
+            }
         }
 
         private void ResetObjectFields()
