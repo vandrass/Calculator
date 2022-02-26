@@ -19,6 +19,7 @@ namespace Calculator.Application
         private int _operatorsCount = 0;
         private int _openBraces = 0;
         private int _closeBraces = 0;
+        private double _result;
         private Dictionary<char, int> _operatorsPriority = new Dictionary<char, int>()
         {
             ['*'] = 4,
@@ -54,7 +55,7 @@ namespace Calculator.Application
 
             if (_enumErrors == EnumErrors.Success)
             {
-                result;
+                result = _result;
             }
 
             return _enumErrors;
@@ -115,7 +116,7 @@ namespace Calculator.Application
         {
             if (_enumErrors == EnumErrors.Success)
             {
-                return expression + "=" + _numbers[0];
+                return expression + "=" + _result;
             }
             else if (_enumErrors == EnumErrors.DivisionByZero)
             {
@@ -140,7 +141,7 @@ namespace Calculator.Application
 
             for (int i = 0; i < stringLenth; i++)
             {
-                if (char.IsDigit(expression[i]))
+                if (char.IsDigit(expression[i]) || (i == 0 && expression[i] == '-'))
                 {
                     strBuilder.Append(expression[i]);
 
@@ -190,38 +191,49 @@ namespace Calculator.Application
             }
         }
 
-        private double Calculating()
+        private void Calculating()
         {
-            double result;
             Stack<double> numbers = new Stack<double>();
 
-            while (_operators.Count > 0)
+            for (int i = 0; i < _outputArray.Count; i++)
             {
-                if ((char)_operators[i] == '/')
-                {
-                    if (_numbers[i + 1] == 0)
-                    {
-                        _enumErrors = EnumErrors.DivisionByZero;
-                        return;
-                    }
+                Type t = _outputArray[i].GetType();
 
-                    result = Division(_numbers[i], _numbers[i + 1]);
-                }
-                else if ((char)_operators[i] == '*')
+                if (t.Equals(typeof(double)))
                 {
-                    result = Multiplication(_numbers[i], _numbers[i + 1]);
+                    numbers.Push((double)_outputArray[i]);
                 }
-                else if((char)_operators[i] == '+')
+                else
                 {
-                    result = Sum(_numbers[i], _numbers[i + 1]);
-                }
-                else if ((char)_operators[i] == '-')
-                {
-                    result = Sub(_numbers[i], _numbers[i + 1]);
-                    InsertAndRemove(result, i);
-                    i--;
+                    double secondNumber = numbers.Pop();
+                    double firstNumber = numbers.Pop();
+
+                    if ((char)_outputArray[i] == '+')
+                    {
+                        numbers.Push(Sum(firstNumber, secondNumber));
+                    }
+                    else if ((char)_outputArray[i] == '-')
+                    {
+                        numbers.Push(Sub(firstNumber, secondNumber));
+                    }
+                    else if ((char)_outputArray[i] == '*')
+                    {
+                        numbers.Push(Multiplication(firstNumber, secondNumber));
+                    }
+                    else if ((char)_outputArray[i] == '/')
+                    {
+                        if (secondNumber == 0)
+                        {
+                            _enumErrors = EnumErrors.DivisionByZero;
+                            return;
+                        }
+
+                        numbers.Push(Division(firstNumber, secondNumber));
+                    }
                 }
             }
+
+            _result = numbers.Peek();
 
             _enumErrors = EnumErrors.Success;
         }
@@ -247,13 +259,6 @@ namespace Calculator.Application
                     _enumErrors = EnumErrors.Correct;
                 }
             }
-        }
-
-        private void InsertAndRemove(double result, int i)
-        {
-            _numbers.Insert(i, result);
-            _numbers.RemoveRange(i + 1, 2);
-            _operators.RemoveAt(i);
         }
 
         private void BuildOutputArray()
@@ -315,8 +320,9 @@ namespace Calculator.Application
 
         private void ResetObjectFields()
         {
-            _numbers.Clear();
-            _operators.Clear();
+            _outputArray.Clear();
+            _operationsStack.Clear();
+            _inputArray.Clear();
             _enumErrors = EnumErrors.None;
         }
 
