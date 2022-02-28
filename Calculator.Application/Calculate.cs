@@ -73,7 +73,13 @@ namespace Calculator.Application
             foreach (var expression in expressionsList)
             {
                 ParseString(expression);
-                Calculating();
+                CheckExpressionCorrection();
+                if (_enumErrors == EnumErrors.Correct)
+                {
+                    BuildOutputArray();
+                    Calculating();
+                }
+
                 WriteAnswerToNewFile(expression, path);
                 ResetObjectFields();
             }
@@ -124,7 +130,7 @@ namespace Calculator.Application
             }
             else if (_enumErrors == EnumErrors.NotCorrectExpression)
             {
-                return expression + " = " + "Expression isn`t Correct!";
+                return expression + " = " + "Expression is not Correct!";
             }
             else if (_enumErrors == EnumErrors.OperatorsError)
             {
@@ -172,7 +178,7 @@ namespace Calculator.Application
             {
                 _inputArray.Add(oper);
 
-                if (oper != '(' || oper != ')')
+                if (oper != '(' && oper != ')')
                 {
                     _operatorsCount++;
                 }
@@ -324,6 +330,11 @@ namespace Calculator.Application
             _operationsStack.Clear();
             _inputArray.Clear();
             _enumErrors = EnumErrors.None;
+            _numbersCount = 0;
+            _operatorsCount = 0;
+            _openBraces = 0;
+            _closeBraces = 0;
+            _result = 0;
         }
 
         private double Sum(double a, double b)
