@@ -28,14 +28,7 @@ namespace Calculator.UI
             {
                 expression = EnterExpression();
                 errors = service.CalculateManualExpression(expression, ref result);
-                if (errors == EnumErrors.Success)
-                {
-                    Console.WriteLine(expression + "=" + result);
-                }
-                else
-                {
-                    Console.WriteLine(errors);
-                }
+                PrintResult(expression, result, errors);
             }
             else
             {
@@ -62,6 +55,30 @@ namespace Calculator.UI
             while (!File.Exists(path));
 
             return path;
+        }
+
+        private static void PrintResult(string expression, double result, EnumErrors errors)
+        {
+            if (errors == EnumErrors.Success)
+            {
+                Console.WriteLine(expression + "=" + result);
+            }
+            else if (errors == EnumErrors.DivisionByZero)
+            {
+                Console.WriteLine("Division By Zero");
+            }
+            else if (errors == EnumErrors.NotCorrectExpression)
+            {
+                Console.WriteLine("Expression is not Correct!");
+            }
+            else if (errors == EnumErrors.OperatorsError)
+            {
+                Console.WriteLine("Number of operators is not correct!");
+            }
+            else
+            {
+                Console.WriteLine("Empty Expression!");
+            }
         }
 
         private static char ChooseCalcMode()
