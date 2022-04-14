@@ -3,7 +3,7 @@
     /// <summary>
     /// Sign user input errors for calculator.
     /// </summary>
-    public enum EnumErrors
+    public enum EnumStatus
     {
         /// <summary>
         /// Empty Input.

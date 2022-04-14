@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Calculator.Application.Exceptions;
 
 namespace Calculator.Application
 {
@@ -12,7 +13,7 @@ namespace Calculator.Application
     /// </summary>
     public class Calculate : ICalculate
     {
-        private EnumErrors _enumErrors = EnumErrors.None;
+        private EnumStatus _enumErrors = EnumStatus.None;
         private ArrayList _inputArray = new ArrayList();
         private ArrayList _outputArray = new ArrayList();
         private Stack _operationsStack = new Stack();
@@ -36,25 +37,16 @@ namespace Calculator.Application
         /// Calculate expression string from user.
         /// </summary>
         /// <param name="expression">string from user.</param>
-        /// <param name="result">resukt if calculation.</param>
-        /// <returns>return errors enum.</returns>
-        public EnumErrors CalculateManualExpression(string expression, ref double result)
+        /// <returns>result of calculation.</returns>
+        public double CalculateManualExpression(string expression)
         {
             ParseString(expression);
             CheckExpressionCorrection();
 
-            if (_enumErrors == EnumErrors.Correct)
-            {
-                BuildOutputArray();
-                Calculating();
-            }
+            BuildOutputArray();
+            Calculating();
 
-            if (_enumErrors == EnumErrors.Success)
-            {
-                result = _result;
-            }
-
-            return _enumErrors;
+            return _result;
         }
 
         /// <summary>
@@ -68,15 +60,19 @@ namespace Calculator.Application
 
             foreach (var expression in expressionsList)
             {
-                ParseString(expression);
-                CheckExpressionCorrection();
-                if (_enumErrors == EnumErrors.Correct)
+                try
                 {
+                    ParseString(expression);
+                    CheckExpressionCorrection();
                     BuildOutputArray();
                     Calculating();
+                    WriteAnswerToNewFile(expression + " = " + _result, path);
+                }
+                catch (Exception e)
+                {
+                    WriteAnswerToNewFile(expression + " = " +  e.Message, path);
                 }
 
-                WriteAnswerToNewFile(expression, path);
                 ResetObjectFields();
             }
 
@@ -117,38 +113,38 @@ namespace Calculator.Application
 
         private void WriteAnswerToNewFile(string expression, string path)
         {
-            string answerFilePath = path + "answer.txt";
+            string answerFilePath = path + "_answer.txt";
             if (!File.Exists(answerFilePath))
             {
                 using var streamWriter = new StreamWriter(answerFilePath);
                 {
-                    streamWriter.WriteLine(GetRightAnswer(expression));
+                    streamWriter.WriteLine(expression);
                 }
             }
             else
             {
                 using var streamWriter = new StreamWriter(answerFilePath, append: true);
                 {
-                    streamWriter.WriteLine(GetRightAnswer(expression));
+                    streamWriter.WriteLine(expression);
                 }
             }
         }
 
         private string GetRightAnswer(string expression)
         {
-            if (_enumErrors == EnumErrors.Success)
+            if (_enumErrors == EnumStatus.Success)
             {
                 return expression + "=" + _result;
             }
-            else if (_enumErrors == EnumErrors.DivisionByZero)
+            else if (_enumErrors == EnumStatus.DivisionByZero)
             {
                 return expression + " = " + "Division By Zero!";
             }
-            else if (_enumErrors == EnumErrors.NotCorrectExpression)
+            else if (_enumErrors == EnumStatus.NotCorrectExpression)
             {
                 return expression + " = " + "Expression is not Correct!";
             }
-            else if (_enumErrors == EnumErrors.OperatorsError)
+            else if (_enumErrors == EnumStatus.OperatorsError)
             {
                 return expression + " = " + "Operators Error!";
             }
@@ -209,7 +205,7 @@ namespace Calculator.Application
             }
             else if (operand != ' ')
             {
-                _enumErrors = EnumErrors.NotCorrectExpression;
+                throw new NotCorrectExpressionException("Not Correct Expression!");
             }
         }
 
@@ -246,8 +242,7 @@ namespace Calculator.Application
                     {
                         if (secondNumber == 0)
                         {
-                            _enumErrors = EnumErrors.DivisionByZero;
-                            return;
+                            throw new DivisionByZeroExcepton("Division By Zero!");
                         }
 
                         numbers.Push(Division(firstNumber, secondNumber));
@@ -256,30 +251,23 @@ namespace Calculator.Application
             }
 
             _result = numbers.Peek();
-
-            _enumErrors = EnumErrors.Success;
         }
 
         private void CheckExpressionCorrection()
         {
-            if (_enumErrors == EnumErrors.None)
+            if (_numbersCount < 1)
             {
-                if (_numbersCount < 1)
-                {
-                    _enumErrors = EnumErrors.None;
-                }
-                else if (_operatorsCount == 0 || _operatorsCount != _numbersCount - 1)
-                {
-                    _enumErrors = EnumErrors.OperatorsError;
-                }
-                else if (_openBraces != _closeBraces)
-                {
-                    _enumErrors = EnumErrors.NotCorrectExpression;
-                }
-                else
-                {
-                    _enumErrors = EnumErrors.Correct;
-                }
+                throw new EmptyExpressionException("Empty Expression!");
+            }
+
+            if (_operatorsCount == 0 || _operatorsCount != _numbersCount - 1)
+            {
+                throw new OperatorErrorException("No correct operators number!");
+            }
+
+            if (_openBraces != _closeBraces)
+            {
+                throw new NotCorrectExpressionException("Not Correct Expression!");
             }
         }
 
@@ -345,7 +333,7 @@ namespace Calculator.Application
             _outputArray.Clear();
             _operationsStack.Clear();
             _inputArray.Clear();
-            _enumErrors = EnumErrors.None;
+            _enumErrors = EnumStatus.None;
             _numbersCount = 0;
             _operatorsCount = 0;
             _openBraces = 0;

@@ -17,8 +17,7 @@ namespace Calculator.UI
         {
             char mode = ChooseCalcMode();
             string expression;
-            double result = 0;
-            EnumErrors errors;
+            double result;
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddScoped<ICalculate, Calculate>();
             var provider = serviceCollection.BuildServiceProvider();
@@ -27,8 +26,18 @@ namespace Calculator.UI
             if (mode == 'm')
             {
                 expression = EnterExpression();
-                errors = service.CalculateManualExpression(expression, ref result);
-                PrintResult(expression, result, errors);
+                try
+                {
+                    result = service.CalculateManualExpression(expression);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+
+                    return;
+                }
+
+                Console.WriteLine(expression + "=" + result);
             }
             else
             {
@@ -55,30 +64,6 @@ namespace Calculator.UI
             while (!File.Exists(path));
 
             return path;
-        }
-
-        private static void PrintResult(string expression, double result, EnumErrors errors)
-        {
-            if (errors == EnumErrors.Success)
-            {
-                Console.WriteLine(expression + "=" + result);
-            }
-            else if (errors == EnumErrors.DivisionByZero)
-            {
-                Console.WriteLine("Division By Zero");
-            }
-            else if (errors == EnumErrors.NotCorrectExpression)
-            {
-                Console.WriteLine("Expression is not Correct!");
-            }
-            else if (errors == EnumErrors.OperatorsError)
-            {
-                Console.WriteLine("Number of operators is not correct!");
-            }
-            else
-            {
-                Console.WriteLine("Empty Expression!");
-            }
         }
 
         private static char ChooseCalcMode()
