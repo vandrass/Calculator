@@ -27,7 +27,7 @@ namespace Calculator.UnitTests
         }
 
         /// <summary>
-        /// Check string exepression with correct input and correct result of exeption.
+        /// Check string exepression with correct input and correct result of expression.
         /// </summary>
         [TestMethod]
         public void StringExpression_CorrectExpression_CorrectResult()
@@ -35,6 +35,23 @@ namespace Calculator.UnitTests
             // Arrange
             var expression = "1 + 2 - 3 * 10 / 5";
             var expected = -3;
+
+            // Act
+            var actual = _service.CalculateManualExpression(expression);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// Check string exepression with correct input and correct result of expression.
+        /// </summary>
+        [TestMethod]
+        public void StringExpression_CorrectExpressionOne_CorrectResult()
+        {
+            // Arrange
+            var expression = "5-5/5+5";
+            var expected = 9;
 
             // Act
             var actual = _service.CalculateManualExpression(expression);
