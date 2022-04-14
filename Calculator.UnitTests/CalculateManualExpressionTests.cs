@@ -152,6 +152,24 @@ namespace Calculator.UnitTests
         }
 
         /// <summary>
+        /// Check string expression enough  operators and enough braces, right result of calculating .
+        /// </summary>
+        [TestMethod]
+        public void StringExpression_EnoughOperatorsAndBraces_RightResult()
+        {
+            // Arrange
+            var expression = "((1 + 2) - 3) * 10";
+            var expected = 0;
+            var actual = 0.0;
+
+            // Act
+            _service.CalculateManualExpression(expression, ref actual);
+
+            // Assert
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
         /// Check string expression with empty input, EnumErrors will be "None" .
         /// </summary>
         [TestMethod]

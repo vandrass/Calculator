@@ -38,7 +38,7 @@ namespace Calculator.UI
 
         private static string EnterExpression()
         {
-            Console.Write("Enter the expression without parentheses: ");
+            Console.Write("Enter the expression: ");
             return Console.ReadLine();
         }
 

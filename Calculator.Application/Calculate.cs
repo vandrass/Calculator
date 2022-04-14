@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -20,6 +21,7 @@ namespace Calculator.Application
         private int _openBraces = 0;
         private int _closeBraces = 0;
         private double _result;
+        private IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
         private Dictionary<char, int> _operatorsPriority = new Dictionary<char, int>()
         {
             ['*'] = 4,
@@ -44,12 +46,6 @@ namespace Calculator.Application
             if (_enumErrors == EnumErrors.Correct)
             {
                 BuildOutputArray();
-
-                foreach (var output in _outputArray)
-                {
-                    Console.WriteLine(output);
-                }
-
                 Calculating();
             }
 
@@ -68,7 +64,7 @@ namespace Calculator.Application
         /// <returns>true - if file saved successfully, false - if file was not saved.</returns>
         public bool CalculateFileExpressions(string path)
         {
-            List<string> expressionsList = GetExpressionsFromFile(path);
+            var expressionsList = GetExpressionsFromFile(path);
 
             foreach (var expression in expressionsList)
             {
@@ -85,6 +81,26 @@ namespace Calculator.Application
             }
 
             return true;
+        }
+
+        private static double Sum(double a, double b)
+        {
+            return a + b;
+        }
+
+        private static double Sub(double a, double b)
+        {
+            return a - b;
+        }
+
+        private static double Division(double a, double b)
+        {
+            return a / b;
+        }
+
+        private static double Multiplication(double a, double b)
+        {
+            return b * a;
         }
 
         private List<string> GetExpressionsFromFile(string path)
@@ -147,13 +163,13 @@ namespace Calculator.Application
 
             for (int i = 0; i < stringLenth; i++)
             {
-                if (char.IsDigit(expression[i]) || (i == 0 && expression[i] == '-'))
+                if (char.IsDigit(expression[i]) || (i == 0 && expression[i] == '-') || expression[i] == '.')
                 {
                     strBuilder.Append(expression[i]);
 
                     if (i == stringLenth - 1)
                     {
-                        _inputArray.Add(double.Parse(strBuilder.ToString()));
+                        _inputArray.Add(double.Parse(strBuilder.ToString(), formatter));
                         _numbersCount++;
                         strBuilder.Clear();
                     }
@@ -162,7 +178,7 @@ namespace Calculator.Application
                 {
                     if (strBuilder.Length > 0)
                     {
-                        _inputArray.Add(double.Parse(strBuilder.ToString()));
+                        _inputArray.Add(double.Parse(strBuilder.ToString(), formatter));
                         _numbersCount++;
                         strBuilder.Clear();
                     }
@@ -172,17 +188,17 @@ namespace Calculator.Application
             }
         }
 
-        private void ParseOperator(char oper)
+        private void ParseOperator(char operand)
         {
-            if (oper == '(' || oper == ')' || oper == '/' || oper == '*' || oper == '-' || oper == '+')
+            if (operand == '(' || operand == ')' || operand == '/' || operand == '*' || operand == '-' || operand == '+')
             {
-                _inputArray.Add(oper);
+                _inputArray.Add(operand);
 
-                if (oper != '(' && oper != ')')
+                if (operand != '(' && operand != ')')
                 {
                     _operatorsCount++;
                 }
-                else if (oper == '(')
+                else if (operand == '(')
                 {
                     _openBraces++;
                 }
@@ -191,7 +207,7 @@ namespace Calculator.Application
                     _closeBraces++;
                 }
             }
-            else if (oper != ' ')
+            else if (operand != ' ')
             {
                 _enumErrors = EnumErrors.NotCorrectExpression;
             }
@@ -199,7 +215,7 @@ namespace Calculator.Application
 
         private void Calculating()
         {
-            Stack<double> numbers = new Stack<double>();
+            var numbers = new Stack<double>();
 
             for (int i = 0; i < _outputArray.Count; i++)
             {
@@ -335,26 +351,6 @@ namespace Calculator.Application
             _openBraces = 0;
             _closeBraces = 0;
             _result = 0;
-        }
-
-        private double Sum(double a, double b)
-        {
-            return a + b;
-        }
-
-        private double Sub(double a, double b)
-        {
-            return a - b;
-        }
-
-        private double Division(double a, double b)
-        {
-            return a / b;
-        }
-
-        private double Multiplication(double a, double b)
-        {
-            return b * a;
         }
     }
 }
