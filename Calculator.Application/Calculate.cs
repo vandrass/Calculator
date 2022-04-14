@@ -13,7 +13,6 @@ namespace Calculator.Application
     /// </summary>
     public class Calculate : ICalculate
     {
-        private EnumStatus _enumErrors = EnumStatus.None;
         private ArrayList _inputArray = new ArrayList();
         private ArrayList _outputArray = new ArrayList();
         private Stack _operationsStack = new Stack();
@@ -28,9 +27,9 @@ namespace Calculator.Application
             ['*'] = 4,
             ['/'] = 4,
             ['-'] = 3,
-            ['+'] = 3,
-            ['('] = 2,
-            [')'] = 2,
+            ['+'] = 2,
+            ['('] = 1,
+            [')'] = 1,
         };
 
         /// <summary>
@@ -152,28 +151,6 @@ namespace Calculator.Application
                     streamWriter.WriteLine(expression);
                 }
             }
-        }
-
-        private string GetRightAnswer(string expression)
-        {
-            if (_enumErrors == EnumStatus.Success)
-            {
-                return expression + "=" + _result;
-            }
-            else if (_enumErrors == EnumStatus.DivisionByZero)
-            {
-                return expression + " = " + "Division By Zero!";
-            }
-            else if (_enumErrors == EnumStatus.NotCorrectExpression)
-            {
-                return expression + " = " + "Expression is not Correct!";
-            }
-            else if (_enumErrors == EnumStatus.OperatorsError)
-            {
-                return expression + " = " + "Operators Error!";
-            }
-
-            return "Empty String";
         }
 
         private void ParseString(string expression)
@@ -357,7 +334,6 @@ namespace Calculator.Application
             _outputArray.Clear();
             _operationsStack.Clear();
             _inputArray.Clear();
-            _enumErrors = EnumStatus.None;
             _numbersCount = 0;
             _operatorsCount = 0;
             _openBraces = 0;
