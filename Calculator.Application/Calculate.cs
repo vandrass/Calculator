@@ -34,6 +34,50 @@ namespace Calculator.Application
         };
 
         /// <summary>
+        /// Method calculate sum of a and b.
+        /// </summary>
+        /// <param name="a">first number.</param>
+        /// <param name="b">second number.</param>
+        /// <returns>result of sum of a and b.</returns>
+        public static double Sum(double a, double b)
+        {
+            return a + b;
+        }
+
+        /// <summary>
+        /// Method calculate subtraction of b from a.
+        /// </summary>
+        /// <param name="a">first number.</param>
+        /// <param name="b">second number.</param>
+        /// <returns>result of subtraction of b from a.</returns>
+        public static double Sub(double a, double b)
+        {
+            return a - b;
+        }
+
+        /// <summary>
+        /// Method calculate division of a by b.
+        /// </summary>
+        /// <param name="a">first number.</param>
+        /// <param name="b">second number.</param>
+        /// <returns>result of division of a by b.</returns>
+        public static double Division(double a, double b)
+        {
+            return a / b;
+        }
+
+        /// <summary>
+        /// Method calculate multiplication of a on b.
+        /// </summary>
+        /// <param name="a">first number.</param>
+        /// <param name="b">second number.</param>
+        /// <returns>result multiplication of of a on b.</returns>
+        public static double Multiplication(double a, double b)
+        {
+            return b * a;
+        }
+
+        /// <summary>
         /// Calculate expression string from user.
         /// </summary>
         /// <param name="expression">string from user.</param>
@@ -70,33 +114,13 @@ namespace Calculator.Application
                 }
                 catch (Exception e)
                 {
-                    WriteAnswerToNewFile(expression + " = " +  e.Message, path);
+                    WriteAnswerToNewFile(expression + " = " + e.Message, path);
                 }
 
                 ResetObjectFields();
             }
 
             return true;
-        }
-
-        private static double Sum(double a, double b)
-        {
-            return a + b;
-        }
-
-        private static double Sub(double a, double b)
-        {
-            return a - b;
-        }
-
-        private static double Division(double a, double b)
-        {
-            return a / b;
-        }
-
-        private static double Multiplication(double a, double b)
-        {
-            return b * a;
         }
 
         private List<string> GetExpressionsFromFile(string path)
