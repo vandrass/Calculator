@@ -16,13 +16,13 @@ namespace Calculator.Application
         private readonly ArrayList _inputArray = new ArrayList();
         private readonly ArrayList _outputArray = new ArrayList();
         private readonly Stack _operationsStack = new Stack();
+        private readonly IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
         private int _numbersCount = 0;
         private int _operatorsCount = 0;
         private int _openBraces = 0;
         private int _closeBraces = 0;
         private double _result;
-        private readonly IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
-        private readonly Dictionary<char, int> _operatorsPriority = new Dictionary<char, int>()
+        private Dictionary<char, int> _operatorsPriority = new Dictionary<char, int>()
         {
             ['*'] = 4,
             ['/'] = 4,
