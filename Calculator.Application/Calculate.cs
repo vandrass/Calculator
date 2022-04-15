@@ -13,16 +13,16 @@ namespace Calculator.Application
     /// </summary>
     public class Calculate : ICalculate
     {
-        private ArrayList _inputArray = new ArrayList();
-        private ArrayList _outputArray = new ArrayList();
-        private Stack _operationsStack = new Stack();
+        private readonly ArrayList _inputArray = new ArrayList();
+        private readonly ArrayList _outputArray = new ArrayList();
+        private readonly Stack _operationsStack = new Stack();
         private int _numbersCount = 0;
         private int _operatorsCount = 0;
         private int _openBraces = 0;
         private int _closeBraces = 0;
         private double _result;
-        private IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
-        private Dictionary<char, int> _operatorsPriority = new Dictionary<char, int>()
+        private readonly IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+        private readonly Dictionary<char, int> _operatorsPriority = new Dictionary<char, int>()
         {
             ['*'] = 4,
             ['/'] = 4,
