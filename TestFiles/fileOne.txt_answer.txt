@@ -6,7 +6,7 @@
 4 6 8+7 = No correct operators number!
 4+a+2 = Not Correct Expression!
 4+10*5/5 = 14
-47-9/8+6 = 39,875
+47-9/8+6 = 51,875
 40/(5-5) = Division By Zero!
 (5+5+5)/(10-5) = 3
 123/0 = Division By Zero!

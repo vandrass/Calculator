@@ -310,6 +310,11 @@ namespace Calculator.Application
                         if (priority[(char)stack.Peek()] >= priority[(char)_inputArray[i]])
                         {
                             _outputArray.Add(stack.Pop());
+                            while (stack.Count != 0 && (char)stack.Peek() == '-' && priority[(char)stack.Peek()] >= priority[(char)_inputArray[i]])
+                            {
+                                _outputArray.Add(stack.Pop());
+                            }
+
                             stack.Push(_inputArray[i]);
                         }
                         else
@@ -323,7 +328,7 @@ namespace Calculator.Application
                 {
                     while (stack.Count > 0)
                     {
-                        _outputArray.Add(stack.Pop());
+                            _outputArray.Add(stack.Pop());
                     }
                 }
             }
