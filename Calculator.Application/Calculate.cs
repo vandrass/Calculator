@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
+using Calculator.Application.Exceptions;
 
 namespace Calculator.Application
 {
@@ -11,10 +13,10 @@ namespace Calculator.Application
     /// </summary>
     public class Calculate : ICalculate
     {
-        private EnumErrors _enumErrors = EnumErrors.None;
-        private ArrayList _inputArray = new ArrayList();
-        private ArrayList _outputArray = new ArrayList();
-        private Stack _operationsStack = new Stack();
+        private readonly ArrayList _inputArray = new ArrayList();
+        private readonly ArrayList _outputArray = new ArrayList();
+        private readonly Stack _operationsStack = new Stack();
+        private readonly IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
         private int _numbersCount = 0;
         private int _operatorsCount = 0;
         private int _openBraces = 0;
@@ -25,40 +27,69 @@ namespace Calculator.Application
             ['*'] = 4,
             ['/'] = 4,
             ['-'] = 3,
-            ['+'] = 3,
-            ['('] = 2,
-            [')'] = 2,
+            ['+'] = 2,
+            ['('] = 1,
+            [')'] = 1,
         };
+
+        /// <summary>
+        /// Method calculate sum of a and b.
+        /// </summary>
+        /// <param name="a">first number.</param>
+        /// <param name="b">second number.</param>
+        /// <returns>result of sum of a and b.</returns>
+        public static double Sum(double a, double b)
+        {
+            return a + b;
+        }
+
+        /// <summary>
+        /// Method calculate subtraction of b from a.
+        /// </summary>
+        /// <param name="a">first number.</param>
+        /// <param name="b">second number.</param>
+        /// <returns>result of subtraction of b from a.</returns>
+        public static double Sub(double a, double b)
+        {
+            return a - b;
+        }
+
+        /// <summary>
+        /// Method calculate division of a by b.
+        /// </summary>
+        /// <param name="a">first number.</param>
+        /// <param name="b">second number.</param>
+        /// <returns>result of division of a by b.</returns>
+        public static double Division(double a, double b)
+        {
+            return a / b;
+        }
+
+        /// <summary>
+        /// Method calculate multiplication of a on b.
+        /// </summary>
+        /// <param name="a">first number.</param>
+        /// <param name="b">second number.</param>
+        /// <returns>result multiplication of of a on b.</returns>
+        public static double Multiplication(double a, double b)
+        {
+            return b * a;
+        }
 
         /// <summary>
         /// Calculate expression string from user.
         /// </summary>
         /// <param name="expression">string from user.</param>
-        /// <param name="result">resukt if calculation.</param>
-        /// <returns>return errors enum.</returns>
-        public EnumErrors CalculateManualExpression(string expression, ref double result)
+        /// <returns>result of calculation.</returns>
+        public double CalculateManualExpression(string expression)
         {
             ParseString(expression);
             CheckExpressionCorrection();
 
-            if (_enumErrors == EnumErrors.Correct)
-            {
-                BuildOutputArray();
+            BuildOutputArray();
+            Calculating();
 
-                foreach (var output in _outputArray)
-                {
-                    Console.WriteLine(output);
-                }
-
-                Calculating();
-            }
-
-            if (_enumErrors == EnumErrors.Success)
-            {
-                result = _result;
-            }
-
-            return _enumErrors;
+            return _result;
         }
 
         /// <summary>
@@ -68,19 +99,23 @@ namespace Calculator.Application
         /// <returns>true - if file saved successfully, false - if file was not saved.</returns>
         public bool CalculateFileExpressions(string path)
         {
-            List<string> expressionsList = GetExpressionsFromFile(path);
+            var expressionsList = GetExpressionsFromFile(path);
 
             foreach (var expression in expressionsList)
             {
-                ParseString(expression);
-                CheckExpressionCorrection();
-                if (_enumErrors == EnumErrors.Correct)
+                try
                 {
+                    ParseString(expression);
+                    CheckExpressionCorrection();
                     BuildOutputArray();
                     Calculating();
+                    WriteAnswerToNewFile(expression + " = " + _result, path);
+                }
+                catch (Exception e)
+                {
+                    WriteAnswerToNewFile(expression + " = " + e.Message, path);
                 }
 
-                WriteAnswerToNewFile(expression, path);
                 ResetObjectFields();
             }
 
@@ -101,43 +136,21 @@ namespace Calculator.Application
 
         private void WriteAnswerToNewFile(string expression, string path)
         {
-            string answerFilePath = path + "answer.txt";
+            string answerFilePath = path + "_answer.txt";
             if (!File.Exists(answerFilePath))
             {
                 using var streamWriter = new StreamWriter(answerFilePath);
                 {
-                    streamWriter.WriteLine(GetRightAnswer(expression));
+                    streamWriter.WriteLine(expression);
                 }
             }
             else
             {
                 using var streamWriter = new StreamWriter(answerFilePath, append: true);
                 {
-                    streamWriter.WriteLine(GetRightAnswer(expression));
+                    streamWriter.WriteLine(expression);
                 }
             }
-        }
-
-        private string GetRightAnswer(string expression)
-        {
-            if (_enumErrors == EnumErrors.Success)
-            {
-                return expression + "=" + _result;
-            }
-            else if (_enumErrors == EnumErrors.DivisionByZero)
-            {
-                return expression + " = " + "Division By Zero!";
-            }
-            else if (_enumErrors == EnumErrors.NotCorrectExpression)
-            {
-                return expression + " = " + "Expression is not Correct!";
-            }
-            else if (_enumErrors == EnumErrors.OperatorsError)
-            {
-                return expression + " = " + "Operators Error!";
-            }
-
-            return "Empty String";
         }
 
         private void ParseString(string expression)
@@ -147,13 +160,13 @@ namespace Calculator.Application
 
             for (int i = 0; i < stringLenth; i++)
             {
-                if (char.IsDigit(expression[i]) || (i == 0 && expression[i] == '-'))
+                if (char.IsDigit(expression[i]) || (i == 0 && expression[i] == '-') || expression[i] == '.')
                 {
                     strBuilder.Append(expression[i]);
 
                     if (i == stringLenth - 1)
                     {
-                        _inputArray.Add(double.Parse(strBuilder.ToString()));
+                        _inputArray.Add(double.Parse(strBuilder.ToString(), formatter));
                         _numbersCount++;
                         strBuilder.Clear();
                     }
@@ -162,7 +175,7 @@ namespace Calculator.Application
                 {
                     if (strBuilder.Length > 0)
                     {
-                        _inputArray.Add(double.Parse(strBuilder.ToString()));
+                        _inputArray.Add(double.Parse(strBuilder.ToString(), formatter));
                         _numbersCount++;
                         strBuilder.Clear();
                     }
@@ -172,17 +185,17 @@ namespace Calculator.Application
             }
         }
 
-        private void ParseOperator(char oper)
+        private void ParseOperator(char operand)
         {
-            if (oper == '(' || oper == ')' || oper == '/' || oper == '*' || oper == '-' || oper == '+')
+            if (operand == '(' || operand == ')' || operand == '/' || operand == '*' || operand == '-' || operand == '+')
             {
-                _inputArray.Add(oper);
+                _inputArray.Add(operand);
 
-                if (oper != '(' && oper != ')')
+                if (operand != '(' && operand != ')')
                 {
                     _operatorsCount++;
                 }
-                else if (oper == '(')
+                else if (operand == '(')
                 {
                     _openBraces++;
                 }
@@ -191,15 +204,15 @@ namespace Calculator.Application
                     _closeBraces++;
                 }
             }
-            else if (oper != ' ')
+            else if (operand != ' ')
             {
-                _enumErrors = EnumErrors.NotCorrectExpression;
+                throw new NotCorrectExpressionException("Not Correct Expression!");
             }
         }
 
         private void Calculating()
         {
-            Stack<double> numbers = new Stack<double>();
+            var numbers = new Stack<double>();
 
             for (int i = 0; i < _outputArray.Count; i++)
             {
@@ -230,8 +243,7 @@ namespace Calculator.Application
                     {
                         if (secondNumber == 0)
                         {
-                            _enumErrors = EnumErrors.DivisionByZero;
-                            return;
+                            throw new DivisionByZeroExcepton("Division By Zero!");
                         }
 
                         numbers.Push(Division(firstNumber, secondNumber));
@@ -240,30 +252,23 @@ namespace Calculator.Application
             }
 
             _result = numbers.Peek();
-
-            _enumErrors = EnumErrors.Success;
         }
 
         private void CheckExpressionCorrection()
         {
-            if (_enumErrors == EnumErrors.None)
+            if (_numbersCount < 1)
             {
-                if (_numbersCount < 1)
-                {
-                    _enumErrors = EnumErrors.None;
-                }
-                else if (_operatorsCount == 0 || _operatorsCount != _numbersCount - 1)
-                {
-                    _enumErrors = EnumErrors.OperatorsError;
-                }
-                else if (_openBraces != _closeBraces)
-                {
-                    _enumErrors = EnumErrors.NotCorrectExpression;
-                }
-                else
-                {
-                    _enumErrors = EnumErrors.Correct;
-                }
+                throw new EmptyExpressionException("Empty Expression!");
+            }
+
+            if (_operatorsCount == 0 || _operatorsCount != _numbersCount - 1)
+            {
+                throw new OperatorErrorException("No correct operators number!");
+            }
+
+            if (_openBraces != _closeBraces)
+            {
+                throw new NotCorrectExpressionException("Not Correct Expression!");
             }
         }
 
@@ -305,6 +310,11 @@ namespace Calculator.Application
                         if (priority[(char)stack.Peek()] >= priority[(char)_inputArray[i]])
                         {
                             _outputArray.Add(stack.Pop());
+                            while (stack.Count != 0 && (char)stack.Peek() == '-' && priority[(char)stack.Peek()] >= priority[(char)_inputArray[i]])
+                            {
+                                _outputArray.Add(stack.Pop());
+                            }
+
                             stack.Push(_inputArray[i]);
                         }
                         else
@@ -318,7 +328,7 @@ namespace Calculator.Application
                 {
                     while (stack.Count > 0)
                     {
-                        _outputArray.Add(stack.Pop());
+                            _outputArray.Add(stack.Pop());
                     }
                 }
             }
@@ -329,32 +339,11 @@ namespace Calculator.Application
             _outputArray.Clear();
             _operationsStack.Clear();
             _inputArray.Clear();
-            _enumErrors = EnumErrors.None;
             _numbersCount = 0;
             _operatorsCount = 0;
             _openBraces = 0;
             _closeBraces = 0;
             _result = 0;
-        }
-
-        private double Sum(double a, double b)
-        {
-            return a + b;
-        }
-
-        private double Sub(double a, double b)
-        {
-            return a - b;
-        }
-
-        private double Division(double a, double b)
-        {
-            return a / b;
-        }
-
-        private double Multiplication(double a, double b)
-        {
-            return b * a;
         }
     }
 }

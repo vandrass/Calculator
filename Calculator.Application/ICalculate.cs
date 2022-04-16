@@ -9,9 +9,8 @@
         /// Calculate expression string from user.
         /// </summary>
         /// <param name="expression">string from user.</param>
-        /// <param name="result">resukt if calculation.</param>
-        /// <returns>return errors enum.</returns>
-        public EnumErrors CalculateManualExpression(string expression, ref double result);
+        /// <returns>result of calculation.</returns>
+        public double CalculateManualExpression(string expression);
 
         /// <summary>
         /// Read file, calculate expressions from him and save expressions with ansewrs to new file.
